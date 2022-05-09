@@ -6,11 +6,29 @@
 #define WINDOW_WIDTH (750)
 #define WINDOW_HEIGHT (500)
 
+// game variables
+int ballsize = 11;
 int paddleWidth = 6;
 int paddleHeight = 60;
 int paddleSpeed = 5;
 
-void DrawPaddles(SDL_Renderer* rend, SDL_Rect paddle1, SDL_Rect paddle2);
+void DrawPaddles(SDL_Renderer* rend, SDL_Rect paddle1, SDL_Rect paddle2)
+{
+    // collision detection with borders
+    if (paddle1.y <= 0) paddle1.y = 0;
+    if (paddle1.y >= WINDOW_HEIGHT - paddleHeight) paddle1.y = WINDOW_HEIGHT - paddleHeight;
+
+    SDL_RenderDrawRect(rend, &paddle1);
+    SDL_RenderDrawRect(rend, &paddle2);
+    SDL_RenderFillRect(rend, &paddle1);
+    SDL_RenderFillRect(rend, &paddle2);
+}
+
+void DrawBall(SDL_Renderer* rend, SDL_Rect ball)
+{
+    SDL_RenderDrawRect(rend, &ball);
+    SDL_RenderFillRect(rend, &ball);
+}
 
 int main(void)
 {
@@ -52,6 +70,12 @@ int main(void)
     paddle2.y = (WINDOW_HEIGHT/2 - paddleHeight/2);
     paddle2.w = paddleWidth;
     paddle2.h = paddleHeight;
+
+    SDL_Rect ball;
+    ball.x = (WINDOW_WIDTH / 2) - ballsize;
+    ball.y = WINDOW_HEIGHT / 2 - ballsize;
+    ball.w = ballsize;
+    ball.h = ballsize;
 
     // keep track of inputs given
     int up = 0;
@@ -97,13 +121,15 @@ int main(void)
         if (up) paddle1.y -= paddleSpeed;
         if (down) paddle1.y += paddleSpeed;
 
-        // collision detection with borders
-        if (paddle1.y <= 0) paddle1.y = 0;
-        if (paddle1.y >= WINDOW_HEIGHT - paddleHeight) paddle1.y = WINDOW_HEIGHT - paddleHeight;
+        SDL_SetRenderDrawColor(rend, 255, 255, 255, 255);
 
-        // draw paddles to screen
+        // draw objects to screen
         DrawPaddles(rend, paddle1, paddle2);
+        DrawBall(rend, ball);
 
+        SDL_SetRenderDrawColor(rend, 0, 0, 0, 255);
+
+        SDL_RenderPresent(rend);
         SDL_RenderClear(rend);
 
         // wait 1/60th of a second
@@ -115,15 +141,4 @@ int main(void)
     SDL_DestroyRenderer(rend);
     SDL_DestroyWindow(win);
     SDL_Quit();
-}
-
-void DrawPaddles(SDL_Renderer* rend, SDL_Rect paddle1, SDL_Rect paddle2)
-{
-    SDL_SetRenderDrawColor(rend, 255, 255, 255, 255);
-    SDL_RenderDrawRect(rend, &paddle1);
-    SDL_RenderDrawRect(rend, &paddle2);
-    SDL_RenderFillRect(rend, &paddle1);
-    SDL_RenderFillRect(rend, &paddle2);
-    SDL_SetRenderDrawColor(rend, 0, 0, 0, 255);
-    SDL_RenderPresent(rend);
 }
