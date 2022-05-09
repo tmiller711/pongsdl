@@ -3,8 +3,14 @@
 #include <SDL2/SDL_timer.h>
 #include <SDL2/SDL_image.h>
 
-#define WINDOW_WIDTH (640)
-#define WINDOW_HEIGHT (480)
+#define WINDOW_WIDTH (750)
+#define WINDOW_HEIGHT (500)
+
+int paddleWidth = 6;
+int paddleHeight = 60;
+int paddleSpeed = 5;
+
+void DrawPaddles(SDL_Renderer* rend, SDL_Rect paddle1, SDL_Rect paddle2);
 
 int main(void)
 {
@@ -36,19 +42,67 @@ int main(void)
     }
 
     SDL_Rect paddle1;
-    paddle1.x = 250;
-    paddle1.y = 150;
-    paddle1.w = 50;
-    paddle1.h = 100;
-    SDL_SetRenderDrawColor(rend, 255, 255, 255, 255);
+    paddle1.x = 100;
+    paddle1.y = (WINDOW_HEIGHT/2 - paddleHeight/2);
+    paddle1.w = paddleWidth;
+    paddle1.h = paddleHeight;
+
+    SDL_Rect paddle2;
+    paddle2.x = WINDOW_WIDTH - 100;
+    paddle2.y = (WINDOW_HEIGHT/2 - paddleHeight/2);
+    paddle2.w = paddleWidth;
+    paddle2.h = paddleHeight;
+
+    // keep track of inputs given
+    int up = 0;
+    int down = 0;
 
     int close_requested = 0;
 
     while (!close_requested)
     {
         // process events
-        SDL_RenderDrawRect(rend, &paddle1);
-        SDL_SetRenderDrawColor(rend, 0, 0, 0, 255);
+        SDL_Event event;
+        while (SDL_PollEvent(&event))
+        {
+            switch (event.type)
+            {
+                case SDL_QUIT:
+                    close_requested = 1;
+                case SDL_KEYDOWN:
+                    switch (event.key.keysym.scancode)
+                    {
+                        case SDL_SCANCODE_UP:
+                            up = 1;
+                            break;
+                        case SDL_SCANCODE_DOWN:
+                            down = 1;
+                            break;
+                    }
+                    break;
+                case SDL_KEYUP:
+                    switch(event.key.keysym.scancode)
+                    {
+                        case SDL_SCANCODE_UP:
+                            up = 0;
+                            break;
+                        case SDL_SCANCODE_DOWN:
+                            down = 0;
+                            break;
+                    }
+                    break;
+            }
+        }
+
+        if (up) paddle1.y -= paddleSpeed;
+        if (down) paddle1.y += paddleSpeed;
+
+        // collision detection with borders
+        if (paddle1.y <= 0) paddle1.y = 0;
+        if (paddle1.y >= WINDOW_HEIGHT - paddleHeight) paddle1.y = WINDOW_HEIGHT - paddleHeight;
+
+        // draw paddles to screen
+        DrawPaddles(rend, paddle1, paddle2);
 
         SDL_RenderClear(rend);
 
@@ -61,4 +115,15 @@ int main(void)
     SDL_DestroyRenderer(rend);
     SDL_DestroyWindow(win);
     SDL_Quit();
+}
+
+void DrawPaddles(SDL_Renderer* rend, SDL_Rect paddle1, SDL_Rect paddle2)
+{
+    SDL_SetRenderDrawColor(rend, 255, 255, 255, 255);
+    SDL_RenderDrawRect(rend, &paddle1);
+    SDL_RenderDrawRect(rend, &paddle2);
+    SDL_RenderFillRect(rend, &paddle1);
+    SDL_RenderFillRect(rend, &paddle2);
+    SDL_SetRenderDrawColor(rend, 0, 0, 0, 255);
+    SDL_RenderPresent(rend);
 }
