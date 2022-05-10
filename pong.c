@@ -16,6 +16,25 @@ int paddleSpeed = 5;
 int xvel = -2;
 int yvel = -5;
 SDL_Rect result;
+TTF_Font* Sans = TTF_OpenFont("sans.ttf", 24);
+
+void init(SDL_Rect* ball, SDL_Rect* paddle1, SDL_Rect* paddle2)
+{
+    paddle1->x = 100;
+    paddle1->y = (WINDOW_HEIGHT/2 - paddleHeight/2);
+    paddle1->w = paddleWidth;
+    paddle1->h = paddleHeight;
+
+    paddle2->x = WINDOW_WIDTH - 100;
+    paddle2->y = (WINDOW_HEIGHT/2 - paddleHeight/2);
+    paddle2->w = paddleWidth;
+    paddle2->h = paddleHeight;
+
+    ball->x = (WINDOW_WIDTH / 2) - ballsize;
+    ball->y = WINDOW_HEIGHT / 2 - ballsize;
+    ball->w = ballsize;
+    ball->h = ballsize;
+}
 
 void DrawPaddles(SDL_Renderer* rend, SDL_Rect paddle1, SDL_Rect paddle2)
 {
@@ -52,6 +71,11 @@ void BallMovement(SDL_Rect* ball, SDL_Rect paddle1, SDL_Rect paddle2)
     }
 }
 
+void Score()
+{
+
+}
+
 int main(void)
 {
     // attempt to initialize graphics and timer system
@@ -82,22 +106,9 @@ int main(void)
     }
 
     SDL_Rect paddle1;
-    paddle1.x = 100;
-    paddle1.y = (WINDOW_HEIGHT/2 - paddleHeight/2);
-    paddle1.w = paddleWidth;
-    paddle1.h = paddleHeight;
-
     SDL_Rect paddle2;
-    paddle2.x = WINDOW_WIDTH - 100;
-    paddle2.y = (WINDOW_HEIGHT/2 - paddleHeight/2);
-    paddle2.w = paddleWidth;
-    paddle2.h = paddleHeight;
-
     SDL_Rect ball;
-    ball.x = (WINDOW_WIDTH / 2) - ballsize;
-    ball.y = WINDOW_HEIGHT / 2 - ballsize;
-    ball.w = ballsize;
-    ball.h = ballsize;
+    init(&ball, &paddle1, &paddle2);
 
     // keep track of inputs given
     int up = 0;
