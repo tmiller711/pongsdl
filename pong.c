@@ -111,7 +111,6 @@ void Score()
         score1 += 1;
         init();
         printf("player1 score: %i\n", score1);
-        SDL_Delay(1000);
         return;
     }
     if (ball.x < 0)
@@ -119,7 +118,6 @@ void Score()
         score2 += 1;
         init();
         SDL_Delay(1000);
-        printf("player2 score: %i\n", score2);
         return;
     }
 }
