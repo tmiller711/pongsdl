@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdbool.h>
 #include <math.h>
 #include <SDL2/SDL_timer.h>
 #include <SDL2/SDL_image.h>
@@ -11,6 +12,10 @@ int ballsize = 11;
 int paddleWidth = 6;
 int paddleHeight = 60;
 int paddleSpeed = 5;
+// keep track of ball velocity
+int xvel = -2;
+int yvel = -5;
+SDL_Rect result;
 
 void DrawPaddles(SDL_Renderer* rend, SDL_Rect paddle1, SDL_Rect paddle2)
 {
@@ -28,6 +33,23 @@ void DrawBall(SDL_Renderer* rend, SDL_Rect ball)
 {
     SDL_RenderDrawRect(rend, &ball);
     SDL_RenderFillRect(rend, &ball);
+}
+
+void BallMovement(SDL_Rect* ball, SDL_Rect paddle1, SDL_Rect paddle2)
+{
+    ball->x += xvel;
+    ball->y += yvel;
+
+    // handle lower and upper bounds
+    if (ball->y >= (WINDOW_HEIGHT - ball->h) || ball->y <= 0)
+        yvel = -yvel;
+
+    bool collision1 = SDL_IntersectRect(ball, &paddle1, &result);
+    bool collision2 = SDL_IntersectRect(ball, &paddle2, &result);
+    if (collision1 || collision2)
+    {
+        xvel = -xvel;
+    }
 }
 
 int main(void)
@@ -126,6 +148,7 @@ int main(void)
         // draw objects to screen
         DrawPaddles(rend, paddle1, paddle2);
         DrawBall(rend, ball);
+        BallMovement(&ball, paddle1, paddle2);
 
         SDL_SetRenderDrawColor(rend, 0, 0, 0, 255);
 
